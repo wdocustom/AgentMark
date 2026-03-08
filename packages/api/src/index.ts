@@ -67,24 +67,26 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   });
 });
 
-// --- Start Server ---
-app.listen(PORT, () => {
-  logger.info({ port: PORT }, 'AgentMark API server started');
+// --- Start Server (skip in serverless environments) ---
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    logger.info({ port: PORT }, 'AgentMark API server started');
 
-  // Start background scheduler
-  const scheduler = createDefaultScheduler();
-  scheduler.start();
+    // Start background scheduler
+    const scheduler = createDefaultScheduler();
+    scheduler.start();
 
-  // Graceful shutdown
-  const shutdown = () => {
-    logger.info('Shutting down...');
-    scheduler.stop();
-    process.exit(0);
-  };
+    // Graceful shutdown
+    const shutdown = () => {
+      logger.info('Shutting down...');
+      scheduler.stop();
+      process.exit(0);
+    };
 
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
-});
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+  });
+}
 
 function getTrackerScript(): string {
   return `
