@@ -1,9 +1,13 @@
-import Redis from 'ioredis';
+import IORedis from 'ioredis';
 import { logger } from '../utils/logger.js';
 
-let _redis: Redis | null = null;
+// ioredis ESM interop: the default export may be the class or a module wrapper
+const Redis = (IORedis as any).default || IORedis;
+type RedisClient = IORedis.Redis;
 
-function getRedis(): Redis | null {
+let _redis: RedisClient | null = null;
+
+function getRedis(): RedisClient | null {
   if (_redis) return _redis;
 
   // Skip Redis in serverless environments without explicit config
@@ -26,11 +30,11 @@ function getRedis(): Redis | null {
     });
   }
 
-  _redis.on('error', (err) => {
+  _redis!.on('error', (err: Error) => {
     logger.error({ err }, 'Redis connection error');
   });
 
-  _redis.on('connect', () => {
+  _redis!.on('connect', () => {
     logger.info('Redis connected');
   });
 
@@ -107,7 +111,7 @@ export async function queueLength(queue: string): Promise<number> {
 }
 
 // Pub/sub for real-time events
-export function createSubscriber(): Redis | null {
+export function createSubscriber(): RedisClient | null {
   const r = getRedis();
   if (!r) return null;
   return r.duplicate();

@@ -1,4 +1,4 @@
-import { createConnection, createTransport } from 'net';
+import { createConnection } from 'net';
 import { query } from '../db/pool.js';
 import { logger } from '../utils/logger.js';
 import { sleep } from '@agentmark/shared';

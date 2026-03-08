@@ -10,6 +10,7 @@
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm run dev --workspace=@agentmark/api",
     "dev:web": "npm run dev --workspace=@agentmark/web",
+    "postinstall": "npm run build --workspace=@agentmark/shared",
     "build": "npm run build --workspaces",
     "build:api": "npm run build --workspace=@agentmark/api",
     "build:web": "npm run build --workspace=@agentmark/web",
