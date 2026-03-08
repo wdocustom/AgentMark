@@ -1,18 +1,16 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@agentmark/shared', '@agentmark/api'],
+  transpilePackages: ['@agentmark/shared'],
   async rewrites() {
-    // In development with a separate API server, proxy API calls
-    if (process.env.API_URL) {
-      return [
-        {
-          source: '/api/:path*',
-          destination: `${process.env.API_URL}/api/:path*`,
-        },
-      ];
-    }
-    return [];
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
+    if (!apiUrl) return [];
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
+      },
+    ];
   },
 };
 
