@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@agentmark/api": "*",
     "@agentmark/shared": "*",
     "next": "^15.1.0",
     "react": "^19.0.0",
