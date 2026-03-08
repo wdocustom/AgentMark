@@ -1,5 +1,6 @@
 import { query } from '../db/pool.js';
 import { logger } from '../utils/logger.js';
+import { callLLM, type LLMMessage, type LLMOptions, type LLMResponse } from '../services/llm.js';
 import type { AgentContext, AgentResult } from './orchestrator.js';
 
 export interface ToolDefinition {
@@ -12,6 +13,7 @@ export abstract class BaseAgent {
   protected context: AgentContext;
   protected tools: Map<string, ToolDefinition> = new Map();
   protected memory: { shortTerm: unknown[]; context: string[] } = { shortTerm: [], context: [] };
+  protected totalTokensUsed = 0;
 
   constructor(context: AgentContext) {
     this.context = context;
@@ -36,6 +38,15 @@ export abstract class BaseAgent {
     this.memory.shortTerm.push({ tool: name, params, result, timestamp: new Date() });
 
     return result;
+  }
+
+  protected async callLLM(
+    messages: LLMMessage[],
+    options: LLMOptions = {}
+  ): Promise<LLMResponse> {
+    const response = await callLLM(messages, options);
+    this.totalTokensUsed += response.tokensUsed;
+    return response;
   }
 
   protected async addToMemory(key: string, value: unknown): Promise<void> {
@@ -67,16 +78,17 @@ export abstract class BaseAgent {
     return result;
   }
 
-  protected applyBrandVoice(content: string): string {
+  protected buildBrandVoiceInstructions(): string {
     const voice = this.context.brandVoice;
-    if (!voice) return content;
+    if (!voice) return '';
 
-    // Apply brand guidelines as post-processing hints
-    const guidelines: string[] = [];
-    if (voice.tone) guidelines.push(`Tone: ${(voice.tone as string[]).join(', ')}`);
-    if (voice.personality) guidelines.push(`Personality: ${voice.personality}`);
-    if (voice.guidelines) guidelines.push(`Guidelines: ${voice.guidelines}`);
+    const parts: string[] = [];
+    if (voice.tone) parts.push(`Tone: ${(voice.tone as string[]).join(', ')}`);
+    if (voice.personality) parts.push(`Personality: ${voice.personality}`);
+    if (voice.guidelines) parts.push(`Guidelines: ${voice.guidelines}`);
 
-    return content;
+    return parts.length > 0
+      ? `\n\nBrand Voice:\n${parts.join('\n')}`
+      : '';
   }
 }
