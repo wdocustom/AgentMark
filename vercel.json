@@ -1,7 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --workspace=@agentmark/shared",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+  "installCommand": "npm install && npm run build --workspace=@agentmark/shared",
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.ts"
+    }
   ]
 }
