@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build --workspace=@agentmark/shared",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api" }
+  ]
+}
