@@ -1,0 +1,31 @@
+{
+  "name": "agentmark",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agentic Marketing Platform - AI-powered marketing automation built from the ground up",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=@agentmark/api",
+    "dev:web": "npm run dev --workspace=@agentmark/web",
+    "build": "npm run build --workspaces",
+    "build:api": "npm run build --workspace=@agentmark/api",
+    "build:web": "npm run build --workspace=@agentmark/web",
+    "db:migrate": "npm run migrate --workspace=@agentmark/api",
+    "db:seed": "npm run seed --workspace=@agentmark/api",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
