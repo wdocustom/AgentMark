@@ -22,11 +22,20 @@ const PORT = parseInt(process.env.PORT || '4000');
 // --- Global Middleware ---
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', /\.vercel\.app$/],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// --- Root ---
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'AgentMark API',
+    version: '0.1.0',
+    endpoints: ['/health', '/api/auth', '/api/content', '/api/campaigns', '/api/analytics', '/api/contacts', '/api/agents'],
+  });
+});
 
 // --- Health Check ---
 app.get('/health', async (_req, res) => {
